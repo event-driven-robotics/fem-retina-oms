@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fixational-retina-reproducibility"
+version = "0.1.0"
+description = "Reproducible fixational-motion stimuli, event simulation, and OMS retina experiments"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24", "scipy>=1.11", "opencv-python>=4.8",
+  "Pillow>=10", "bimvee",
+]
+
+[project.scripts]
+retina-reproduce = "reproduce.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["reproduce*", "eye_movements*", "events_camera_simulator*", "retina_model*", "moving_objects*", "common_utils*"]
+
+[tool.setuptools.package-data]
+reproduce = ["example.json"]
