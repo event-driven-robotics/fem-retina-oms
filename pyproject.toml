@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fixational-retina-reproducibility"
+name = "2026-bouanane-npjRobotics"
 version = "0.1.0"
 description = "Reproducible fixational-motion stimuli, event simulation, and OMS retina experiments"
 requires-python = ">=3.10"
