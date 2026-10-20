@@ -1,5 +1,4 @@
 import json
-import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,6 +12,8 @@ from common_utils.utils import compute_object_selectivity
 from common_utils.statistics import paired_sign_flip, holm
 from eye_movements.doves import load_doves, render_background
 from events_camera_simulator.streaming import generate_events_streaming, bin_events_to_disk
+from scripts import load_doves as load_step, generate_motion, generate_stimuli, generate_events, run_retina, characterize, analyze
+from moving_objects.add_multi_moving_objects import MovingObjectSpec
 
 
 class ReleaseTests(unittest.TestCase):
@@ -54,7 +55,7 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "two"):
             paired_sign_flip([1])
 
-    def test_readme_stages_for_all_conditions(self):
+    def test_independent_steps_for_all_conditions(self):
         root = self.tmp_path
         rng = np.random.default_rng(42)
         image_path = root / 'scene.iml'
@@ -67,32 +68,16 @@ class ReleaseTests(unittest.TestCase):
         sprite[1:9, 1:9] = [255, 255, 255, 255]
         object_path = root / 'object.png'
         Image.fromarray(sprite).save(object_path)
-        readme = (Path(__file__).resolve().parents[1] / 'README.md').read_text()
-        blocks = re.findall(r'```python\n(.*?)```', readme, re.S)
-        self.assertEqual(len(blocks), 7)
-        original = '\n'.join(blocks[:6])
         for condition in ['doves', 'circular', 'wobbly']:
             previous = None
             for repeat in range(2):
                 out = root / f'{condition}_{repeat}'
-                code = original
-                replacements = {
-                    "'/path/to/Doves/Images/imk01366.iml'": repr(str(image_path)),
-                    "'/path/to/Doves/Fixations/imk01366.iml.mat'": repr(str(recording)),
-                    "'/path/to/objects/object.png'": repr(str(object_path)),
-                    "'results/example_doves_subject0'": repr(str(out)),
-                    "condition = 'doves'": f'condition = {condition!r}',
-                    'contrast_boost=False)': 'contrast_boost=False, image_shape=(64, 80))',
-                    'crop_shape = (720, 960)': 'crop_shape = (48, 64)',
-                    'n_frames = 100': 'n_frames = 12',
-                    'ksize = 39': 'ksize = 5',
-                    'area_fraction=0.01, speed_px_s=250': 'area_fraction=0.04, speed_px_s=25',
-                }
-                for source, replacement in replacements.items():
-                    self.assertIn(source, code)
-                    code = code.replace(source, replacement)
-                namespace = {}
-                exec(compile(code, 'README.md', 'exec'), namespace)
+                load_step.run(image_path, recording, 0, out, image_shape=(64, 80))
+                generate_motion.run(out, condition, 12)
+                generate_stimuli.run(out, [MovingObjectSpec(object_path, .04, 25)], (48, 64))
+                generate_events.run(out)
+                run_retina.run(out, ksize=5)
+                characterize.run(out)
                 spikes = np.load(out / 'spikes.npy')
                 self.assertEqual(spikes.shape, (12, 48, 64))
                 self.assertTrue(np.isin(spikes, [0, 1]).all())
@@ -106,11 +91,18 @@ class ReleaseTests(unittest.TestCase):
                     np.testing.assert_array_equal(previous[1], spikes)
                 previous = (events, spikes)
                 if condition == 'doves' and repeat == 0:
-                    background_code = code.replace('with_object = True', 'with_object = False')
-                    background_code = background_code.replace(repr(str(out)), repr(str(root / 'background')))
-                    exec(compile(background_code, 'README.md', 'exec'), {})
+                    background = root / 'background'
+                    load_step.run(image_path, recording, 0, background, image_shape=(64, 80))
+                    generate_motion.run(background, 'doves', 12)
+                    generate_stimuli.run(background, [], (48, 64))
+                    generate_events.run(background)
+                    run_retina.run(background, ksize=5)
+                    characterize.run(background)
                     result = json.loads((root / 'background/result.json').read_text())
                     self.assertIsNone(result['oms_model'])
+
+        analyze.run(root)
+        self.assertTrue((root / 'summary.csv').is_file())
 
     def test_background_translation_and_input_checks(self):
         image = np.arange(80, dtype=np.uint8).reshape(8, 10)
