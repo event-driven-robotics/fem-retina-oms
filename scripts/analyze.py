@@ -3,6 +3,8 @@ import csv
 import json
 from pathlib import Path
 import numpy as np
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common_utils.io import save_json
 from common_utils.statistics import paired_sign_flip
 

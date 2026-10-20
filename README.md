@@ -1,4 +1,4 @@
-# 2026-bouanane-npjRobotics
+# 2026-bouanane-npjRobotics-code
 
 Code for fixational-motion stimuli, event-camera simulation, and the OMS retina model.
 
@@ -8,12 +8,14 @@ Download [DOVES](https://live.ece.utexas.edu/research/doves/) following the site
 access and citation instructions. Keep its `Images/` and `Fixations/` folders,
 and your RGBA object images, outside this repository.
 
-With Python 3.10 or later, install from the repository root:
+Clone this repository and install the dependencies with Python 3.10 or later:
 
 ```bash
+git clone <repository-url>
+cd 2026-bouanane-npjRobotics-code
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -e .
+python -m pip install -r requirements.txt
 ```
 
 ## Workflow

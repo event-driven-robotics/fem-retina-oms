@@ -1,6 +1,8 @@
 """Step 4: simulate and bin events from saved stimulus frames."""
 import json
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common_utils.io import save_json
 from events_camera_simulator.streaming import generate_events_streaming, bin_events_to_disk
 

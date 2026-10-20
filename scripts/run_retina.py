@@ -2,6 +2,8 @@
 import json
 from pathlib import Path
 import numpy as np
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common_utils.io import save_json
 from retina_model.oms_retina import normalize_bipolar_responces, run_oms_retina_
 

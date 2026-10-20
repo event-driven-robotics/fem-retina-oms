@@ -1,6 +1,8 @@
 """Step 2: filter DOVES saccades or create circular/wobbly camera motion."""
 from pathlib import Path
 import numpy as np
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common_utils.io import save_json
 from eye_movements.utils import detect_microsaccades_engbert, stitch_by_increments, circular, sine_velocity_trajectory
 

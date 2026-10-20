@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 import numpy as np
 from PIL import Image
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common_utils.io import save_json
 from eye_movements.doves import render_background
 from moving_objects.add_multi_moving_objects import MovingObjectSpec, generate_multi_object_sequence

@@ -19,11 +19,9 @@ Five tests cover:
 - Event-free sequences and known exact/vicinity selectivity values.
 - Known paired sign-flip probabilities and Holm-adjusted p-values.
 
-The core modules were previously built as a wheel and tested from a separate
-temporary installation. The step scripts are run from this repository after
-installing the core package; they are not installed CLI entry points. Dependencies
-came from the existing OMS environment; a fresh online dependency installation
-was not tested.
+The step scripts are run directly from a clone of this repository; the package is
+not installed. Dependencies came from the existing OMS environment; a fresh online
+dependency installation from `requirements.txt` was not tested.
 
 The synthetic runs use 12 frames at 48×64 output resolution. They verify software
 integration, not scientific agreement on DOVES. Full-resolution memory/runtime,
