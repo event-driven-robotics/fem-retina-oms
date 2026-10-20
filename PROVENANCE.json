@@ -1,7 +1,0 @@
-{
-  "source_repository": "https://github.com/msbouanane/2026-bouanane-npjRobotics",
-  "source_commit": "3b57fa078b80ea58055dd35e1a503983d786eada",
-  "historical_repository": "https://github.com/msbouanane/fixationalEyeMovements/tree/ICONS",
-  "historical_commit": "ce35e4838d4f8be881406d2b0bb8d1e832b6e4d7",
-  "note": "Core functions extracted from current source; legacy simulator quantization and clock preserved. Paper-data equivalence remains to be checked."
-}
