@@ -33,4 +33,4 @@ simulator on identical synthetic frames with seed 20261012. Encoded timestamp an
 address records matched after sorting equal-time records. The step scripts use
 that streaming module without changing its implementation. The detector,
 stitching, circular/wobbly formulas, retina recurrence, and selectivity calculation
-remain from the source commit listed in `PROVENANCE.json`.
+remain unchanged from the original implementation.

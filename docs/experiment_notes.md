@@ -34,6 +34,3 @@ from the actual study design; frames are not independent experimental units.
 For multiple comparisons, the Holm helper is in
 [common_utils/statistics.py](../common_utils/statistics.py).
 
-The example parameter values still need checking against the paper's actual
-runs. Begin with a short sequence: mask scoring uses memory proportional to
-sequence size, although event bins and retina outputs are memory-mapped.

@@ -1,6 +1,8 @@
-# 2026-bouanane-npjRobotics-code
+# fem-retina-oms
 
-Code for fixational-motion stimuli, event-camera simulation, and the OMS retina model.
+Code for the paper "Biological Fixational Eye Movements enable retinal-inspired
+independent-motion segmentation during fixation": fixational-motion stimuli,
+event-camera simulation, and the OMS retina model.
 
 ## Setup
 
@@ -12,9 +14,7 @@ Clone this repository and install the dependencies with Python 3.10 or later:
 
 ```bash
 git clone <repository-url>
-cd 2026-bouanane-npjRobotics-code
-python3 -m venv .venv
-source .venv/bin/activate
+cd fem-retina-oms
 python -m pip install -r requirements.txt
 ```
 
@@ -41,6 +41,6 @@ and paper parameters before running the full dataset.
 ## Checks
 
 Run `python -m unittest discover -s tests -v` for synthetic tests.
-See [experiment notes](docs/experiment_notes.md) for parameter and timing details,
-[validation](VALIDATION.md) for testing status, and [provenance](PROVENANCE.json)
-for source commits. Validation against the paper's data is still pending.
+See [experiment notes](docs/experiment_notes.md) for parameter and timing details
+and [validation](VALIDATION.md) for testing status. Validation against the paper's
+data is still pending.
