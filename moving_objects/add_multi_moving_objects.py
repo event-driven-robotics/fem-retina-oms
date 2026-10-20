@@ -21,8 +21,6 @@ except ImportError:  # Only required when applying a camera motion trace.
 import numpy as np
 from PIL import Image, ImageOps
 
-create_gif = None
-
 try:
     from .add_moving_objects import (
         combine_masks,
@@ -1280,8 +1278,6 @@ def generate_multi_object_sequence(
     allow_partial_visibility: bool = False,
     single_object_area_tolerance: float | None = None,
     single_object_area_variation: float = 0.002,
-    save_gifs: bool = True,
-    single_object_arc: bool = False,
 ) -> None:
     """Generate independent-speed wandering objects with continuous collisions.
 
@@ -1295,8 +1291,6 @@ def generate_multi_object_sequence(
             tries full visibility first, then fixed-scale bounded partial visibility.
         single_object_area_variation: Maximum temporal range of visible fraction
             when the single-object visible-area constraint is enabled.
-        save_gifs: Save optional scene/mask GIFs in addition to individual frames.
-        single_object_arc: Traverse a fully visible, constant-speed upper semicircle left-to-right.
     """
     _ = planning_allowed_overlap
     _ = allow_object_replacement_on_failure
@@ -1390,8 +1384,6 @@ def generate_multi_object_sequence(
     use_partial_visibility = allow_partial_visibility or (allow_partial_visibility_single and len(active_specs) == 1)
     # Extract per-object visibility flags from specs
     per_object_visibility_flags = [spec.allow_partial_visibility for spec in active_specs]
-    if single_object_arc and (len(active_specs) != 1 or single_object_area_tolerance is not None):
-        raise ValueError("Arc motion requires one object and no bounded-area placement mode")
     if single_object_area_tolerance is not None:
         if len(active_specs) != 1 or mask_mode != "binary":
             raise ValueError("Visible-area constraints require one object and binary masks.")
@@ -1406,15 +1398,7 @@ def generate_multi_object_sequence(
     )
 
     dt = 1.0 / float(fps)
-    if single_object_arc:
-        from moving_objects.conference_motion import semicircle_centers
-        rendered_sprites = [transform_object(p.image, angle_deg=0.0, scale=p.scale) for p in planned_objects]
-        positions, motion_stats = semicircle_centers(
-            planning_scene_rect, rendered_sprites[0].size, N, dt,
-            active_specs[0].speed_px_s, collision_gap_px,
-        )
-        planned_trajectories = [_build_sampled_trajectory(positions.tolist())]
-    elif single_object_area_tolerance is not None:
+    if single_object_area_tolerance is not None:
         from moving_objects.constant_visible_area import plan_single_visible_area
         planned_objects, planned_trajectories, rendered_sprites, motion_stats = plan_single_visible_area(
             base_size, target_scene_size, motion_trace, active_specs[0], N,
@@ -1456,7 +1440,6 @@ def generate_multi_object_sequence(
     out_dir = Path(out_dir)
     output_w, output_h = (target_scene_size[1], target_scene_size[0]) if target_scene_size else base_size
     output_area = float(output_w * output_h)
-    generated_frames = [] if run_event_camera else None
 
     frames_stack = None
     masks_stack = None
@@ -1581,8 +1564,6 @@ def generate_multi_object_sequence(
         frame_path = frames_dir / f"frame_{frame_index:04d}.png"
         frame_out.save(frame_path)
 
-        if generated_frames is not None:
-            generated_frames.append(np.asarray(frame_out.convert("RGB"), dtype=np.uint8))
 
         for object_index, mask in enumerate(object_masks):
             mask_path = object_mask_dirs[object_index] / f"mask_{frame_index:04d}.png"
@@ -1691,19 +1672,8 @@ def generate_multi_object_sequence(
             save_dict["mask_union"] = union_stack
         np.savez_compressed(npz_path, **save_dict)
 
-    try:
-        if save_gifs and create_gif is not None:
-            duration_ms = max(10, int(1000.0 / float(fps)))
-            gif_path = out_dir / "frames_animation.gif"
-            create_gif(str(frames_dir), str(gif_path), duration=duration_ms)
-            if save_union_mask:
-                union_gif_path = out_dir / "masks_union_animation.gif"
-                create_gif(str(union_dir), str(union_gif_path), duration=duration_ms)
-    except Exception:
-        pass
-
     if run_event_camera:
-        from events_camera_simulator.conference_stream import generate_events_streaming
+        from events_camera_simulator.streaming import generate_events_streaming
         if event_cropping_limits is not None and any(v is not None for v in event_cropping_limits):
             raise ValueError("Crop frames and masks together before event generation")
         generate_events_streaming(out_dir, dt=dt, tolerance=event_tolerance,

@@ -12,11 +12,5 @@ dependencies = [
   "Pillow>=10", "bimvee",
 ]
 
-[project.scripts]
-retina-reproduce = "reproduce.cli:main"
-
 [tool.setuptools.packages.find]
-include = ["reproduce*", "eye_movements*", "events_camera_simulator*", "retina_model*", "moving_objects*", "common_utils*"]
-
-[tool.setuptools.package-data]
-reproduce = ["example.json"]
+include = ["eye_movements*", "events_camera_simulator*", "retina_model*", "moving_objects*", "common_utils*"]
